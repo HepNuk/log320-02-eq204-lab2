@@ -27,4 +27,7 @@ public class App {
             }
         }
     }
+
+    private static void encodeData() {}
+    private static void decodeData() {}
 }
