@@ -1,8 +1,9 @@
 import java.util.Comparator;
 
-public class HuffmanComparator implements Comparable<HuffmanNode>{
+public class HuffmanComparator implements Comparator<HuffmanNode>{
     @Override
-    public int compareTo(HuffmanNode o) {
-        return 0;
+    public int compare(HuffmanNode o1, HuffmanNode o2) {
+        return o1.getCount() - o2.getCount();
+
     }
 }
