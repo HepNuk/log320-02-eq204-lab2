@@ -13,43 +13,28 @@ public class App {
         String toDecompress = "to_decompress.txt";
         String outputCompressed = "compressed.txt";
         String outputDecompressed = "decompressed.txt";
+        char mode = 'c';
         //// TEMPORARY
-        Map<Character, Integer> sortedMap = sortHashMapByValues(loadCharsInHashMap(toCompress));
+        FileInputStream fis = new FileInputStream(toCompress);
+        Map<Character, Integer> sortedMap = sortHashMapByValues(loadFileAsCharHashMap(fis));
         printMap(sortedMap);
 
-        System.exit(0);
-
-        /// ------------------------ ///
-        boolean validMode = false;
-        while (!validMode) {
-            System.out.print("Mode ? [c|d]: ");
-            char mode;
-            try {
-                mode = (char) System.in.read();
-            } catch (IOException e) {
-                mode = '!';
-            }
-
-            switch (mode) {
-                case 'c':
-                    System.out.println("Encoding...");
-                    validMode = true;
-                    break;
-                case 'd':
-                    System.out.println("Decoding...");
-                    validMode = true;
-                    break;
-                default:
-                    System.out.println("Wrong Mode..");
-                    break;
-            }
+        switch (mode) {
+            case 'c':
+                System.out.println("Encoding... TODO:");
+                break;
+            case 'd':
+                System.out.println("Decoding... TODO:");
+                break;
+            default:
+                System.out.println("Invalid Mode..");
+                System.exit(-1);
+                break;
         }
     }
 
-    private static Map<Character, Integer> loadCharsInHashMap(String filename) throws FileNotFoundException {
+    private static Map<Character, Integer> loadFileAsCharHashMap(FileInputStream fis) {
         Map<Character, Integer> charMap = new HashMap<>();
-
-        FileInputStream fis = new FileInputStream(filename);
         try (InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
             int singleCharInt;
             char singleChar;
@@ -102,7 +87,6 @@ public class App {
         }
         return sortedMap;
     }
-
 
     private static void encodeData() {}
     private static void decodeData() {}
