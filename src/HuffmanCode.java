@@ -1,12 +1,13 @@
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HuffmanCode {
-    private ArrayList<HuffmanReference> huffmanReferenceTable;
+    private Map<Character, String> huffmanTableMap;
     private final HuffmanNode rootNode;
 
-    public HuffmanCode (HuffmanNode rootNode) {
-        this.rootNode = rootNode;
-        this.huffmanReferenceTable = new ArrayList<>();
+    public HuffmanCode () {
+        this.rootNode = new HuffmanNode();
+        this.huffmanTableMap = new HashMap<>();
     }
 
     public void encodeHuffmanCode(HuffmanNode rootNode, String data) {
@@ -18,9 +19,17 @@ public class HuffmanCode {
     }
 
     public HuffmanNode getRootNode() { return this.rootNode; }
-    public ArrayList<HuffmanReference> getHuffmanReferenceTable() { return this.huffmanReferenceTable; }
+    public Map<Character, String> getHuffmanReferenceTable() { return this.huffmanTableMap; }
 
-    public void addReference(String huffmanCode, char huffmanChar) {
-        this.huffmanReferenceTable.add(new HuffmanReference(huffmanCode, huffmanChar));
+    private void addReference(char huffmanChar, String huffmanCode) {
+        this.huffmanTableMap.put(huffmanChar, huffmanCode);
+    }
+
+    public void createHuffmanTableMap() {
+
+    }
+
+    public void createHuffmanDataTree() {
+
     }
 }
