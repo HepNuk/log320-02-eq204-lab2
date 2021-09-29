@@ -1,17 +1,32 @@
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
-public class HuffmanCode {
-    private Map<Character, String> huffmanTableMap;
-    private final HuffmanNode rootNode;
+public class HuffmanCode implements Serializable {
+    private Map<Character, String> huffmanMap;
+    private HuffmanNode rootNode;
 
     public HuffmanCode () {
         this.rootNode = new HuffmanNode();
-        this.huffmanTableMap = new HashMap<>();
+        this.huffmanMap = new HashMap<>();
     }
 
-    public void encodeHuffmanCode(HuffmanNode rootNode, String data) {
-        // encode and return data as huffman code
+    public void encodeHuffmanCode(Iterator<Character> iterator, String huffmanValue, HuffmanNode currentNode) {
+        Character current = iterator.next();
+
+        if (!iterator.hasNext()) {
+            huffmanMap.put(current, huffmanValue + "0");
+            currentNode.setZero(new HuffmanNode(current));
+        } else {
+            huffmanMap.put(current, huffmanValue + "1");
+            currentNode.setOne(new HuffmanNode(current));
+            currentNode.setZero(new HuffmanNode());
+            currentNode = currentNode.getZero();
+
+            encodeHuffmanCode(iterator, huffmanValue + "0", currentNode);
+        }
     }
 
     public void decodeHuffmanCode(String data) {
@@ -19,10 +34,10 @@ public class HuffmanCode {
     }
 
     public HuffmanNode getRootNode() { return this.rootNode; }
-    public Map<Character, String> getHuffmanReferenceTable() { return this.huffmanTableMap; }
+    public Map<Character, String> getHuffmanReferenceTable() { return this.huffmanMap; }
 
     private void addReference(char huffmanChar, String huffmanCode) {
-        this.huffmanTableMap.put(huffmanChar, huffmanCode);
+        this.huffmanMap.put(huffmanChar, huffmanCode);
     }
 
     public void createHuffmanTableMap() {
@@ -32,4 +47,6 @@ public class HuffmanCode {
     public void createHuffmanDataTree() {
 
     }
+
+    // Private methods
 }

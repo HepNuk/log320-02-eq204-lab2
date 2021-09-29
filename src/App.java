@@ -15,9 +15,17 @@ public class App {
         String outputDecompressed = "decompressed.txt";
         char mode = 'c';
         //// TEMPORARY
+
         FileInputStream fis = new FileInputStream(toCompress);
-        Map<Character, Integer> sortedMap = sortHashMapByValues(loadFileAsCharHashMap(fis));
-        printMap(sortedMap);
+        List<Character> orderedChars = sortHashMapByValuesToList(loadFileAsCharHashMap(fis));
+        System.out.println(orderedChars);
+        HuffmanCode huffmanCode = new HuffmanCode();
+        huffmanCode.encodeHuffmanCode(orderedChars.iterator(), "", huffmanCode.getRootNode());
+//        printMap(huffmanCode.getHuffmanReferenceTable());
+        FileInputStream fis2 = new FileInputStream(toCompress);
+        String huffmanString = compress(fis2, huffmanCode.getHuffmanReferenceTable());
+        System.out.println(huffmanString);
+        System.out.println(huffmanString.length());
 
         switch (mode) {
             case 'c':
@@ -31,6 +39,23 @@ public class App {
                 System.exit(-1);
                 break;
         }
+    }
+
+    private static String compress(FileInputStream fis, Map<Character, String> huffmanMap) {
+        StringBuilder huffmanEncodedString = new StringBuilder();
+        try (InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
+            int singleCharInt;
+            char singleChar;
+
+            while ((singleCharInt = isr.read()) != -1) {
+                singleChar = (char) singleCharInt;
+                huffmanEncodedString.append(huffmanMap.get(singleChar));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return huffmanEncodedString.toString();
     }
 
     private static Map<Character, Integer> loadFileAsCharHashMap(FileInputStream fis) {
@@ -56,20 +81,21 @@ public class App {
         return charMap;
     }
 
-    public static void printMap(Map<Character, Integer> map) {
-        for (Entry<Character, Integer> entry : map.entrySet()) {
+    public static void printMap(Map<Character, String> map) {
+        for (Entry<Character, String> entry : map.entrySet()) {
             System.out.println(entry.getKey() +"\t"+entry.getValue());
         }
         System.out.println("\n");
     }
 
-    public static LinkedHashMap<Character, Integer> sortHashMapByValues(Map<Character, Integer> passedMap) {
+    public static List<Character> sortHashMapByValuesToList(Map<Character, Integer> passedMap) {
         List<Character> mapKeys = new ArrayList<>(passedMap.keySet());
         List<Integer> mapValues = new ArrayList<>(passedMap.values());
         mapValues.sort(Collections.reverseOrder());
         mapKeys.sort(Collections.reverseOrder());
 
         LinkedHashMap<Character, Integer> sortedMap = new LinkedHashMap<>();
+        List<Character> sortedList = new LinkedList<>();
 
         for (Integer val : mapValues) {
             Iterator<Character> keyIt = mapKeys.iterator();
@@ -80,12 +106,12 @@ public class App {
 
                 if (comp1.equals(val)) {
                     keyIt.remove();
-                    sortedMap.put(key, val);
+                    sortedList.add(key);
                     break;
                 }
             }
         }
-        return sortedMap;
+        return sortedList;
     }
 
     private static void encodeData() {}

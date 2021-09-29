@@ -1,15 +1,18 @@
 public class HuffmanNode {
     private char c;
-    private int count;
 
     private HuffmanNode zero;
     private HuffmanNode one;
 
     public HuffmanNode(char c, int count, HuffmanNode zero, HuffmanNode one) {
         this.c = c;
-        this.count = count;
         this.zero = zero;
         this.one = one;
+    }
+    public HuffmanNode(char c) {
+        this.c = c;
+        this.zero = null;
+        this.one = null;
     }
     public HuffmanNode() {
         this.zero = null;
@@ -17,12 +20,12 @@ public class HuffmanNode {
     }
 
     public char getC() { return this.c; }
-    public int getCount() { return this.count; }
     public HuffmanNode getZero() { return this.zero; }
     public HuffmanNode getOne() { return this.one; }
 
-    public void setC(char c) {this.c = c; }
-    public void setCount(int count) { this.count = count; }
+    public void setC(char c) { this.c = c; }
     public void setZero(HuffmanNode zero) { this.zero = zero; }
     public void setOne(HuffmanNode one) { this.one = one; }
+
+    public Boolean isEndNode() { return (this.zero == null && this.one == null); }
 }
