@@ -11,28 +11,32 @@ public class App {
         String toDecompress = "to_decompress.txt";
         String outputCompressed = "compressed.txt";
         String outputDecompressed = "decompressed.txt";
-        char mode = 'c';
+        char mode = 'c'; // char mode = args[0]
         //// TEMPORARY
 
-        FileInputStream fis = new FileInputStream(toCompress);
-        Map<Character, Integer> orderedFrequencyTable = sortHashMapByValues(loadFileAsCharHashMap(fis));
-        HuffmanCode huffmanCode = new HuffmanCode();
-
-        huffmanCode.buildHuffmanTree(orderedFrequencyTable);
-
-
-
-        FileInputStream fis2 = new FileInputStream(toCompress);
-        String huffmanString = compress(fis2, huffmanCode.getHuffmanReferenceTable());
-        System.out.println(huffmanString);
-        System.out.println(huffmanString.length());
 
         switch (mode) {
             case 'c':
                 System.out.println("Encoding... TODO:");
+
+                FileInputStream fis = new FileInputStream(toCompress);
+                Map<Character, Integer> orderedFrequencyTable = sortHashMapByValues(loadFileAsCharHashMap(fis));
+                HuffmanCode huffmanCode = new HuffmanCode();
+
+                huffmanCode.buildHuffmanTree(orderedFrequencyTable);
+
+                FileInputStream fis2 = new FileInputStream(toCompress);
+                String huffmanString = compress(fis2, huffmanCode.getHuffmanReferenceTable());
+
+                // TODO: Don't print, instead output to file.
+                System.out.println(huffmanString);
+                System.out.println(huffmanString.length());
+
                 break;
             case 'd':
                 System.out.println("Decoding... TODO:");
+
+                //TODO: Decode encoded file.
                 break;
             default:
                 System.out.println("Invalid Mode..");

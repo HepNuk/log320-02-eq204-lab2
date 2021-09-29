@@ -10,47 +10,6 @@ public class HuffmanCode implements Serializable {
         this.huffmanMap = new HashMap<>();
     }
 
-    public void encodeHuffmanCode(Iterator<Character> iterator, String huffmanValue, HuffmanNode currentNode) {
-        Character current = iterator.next();
-
-        if (!iterator.hasNext()) {
-            huffmanMap.put(current, huffmanValue + "0");
-//            currentNode.setZero(new HuffmanNode(current));
-        } else {
-            huffmanMap.put(current, huffmanValue + "1");
-//            currentNode.setOne(new HuffmanNode(current));
-            currentNode.setZero(new HuffmanNode());
-            currentNode = currentNode.getZero();
-
-            encodeHuffmanCode(iterator, huffmanValue + "0", currentNode);
-        }
-    }
-
-    public void encodeHuffmanCode2(Map<Character, Integer> characterFrequencyTable) {
-        HuffmanNode currentNode = null;
-        HuffmanNode sideNode = null;
-
-        for (Map.Entry<Character, Integer> entry : characterFrequencyTable.entrySet()) {
-            char c = entry.getKey();
-            int freq = entry.getValue();
-
-            if (currentNode == null) {
-                currentNode = new HuffmanNode(c, freq);
-            } else if (currentNode.getFreq() > freq) {
-                HuffmanNode newHuffmanCharNode = new HuffmanNode(c, freq);
-                HuffmanNode newHuffmanNode = new HuffmanNode(currentNode.getFreq() + freq, currentNode, newHuffmanCharNode);
-                currentNode = newHuffmanNode;
-            } else if (currentNode.getFreq() <= freq) {
-                if (sideNode == null) {
-                    sideNode = currentNode;
-                    currentNode = new HuffmanNode(c, freq);
-                } else if (sideNode.getFreq() <= freq) {
-
-                }
-            }
-        }
-    }
-
     public void buildHuffmanTree(Map<Character, Integer> characterFrequencyTable) {
         PriorityQueue<HuffmanNode> queue = new PriorityQueue<>(characterFrequencyTable.size(), new Comparator<HuffmanNode>() {
             @Override
@@ -100,17 +59,19 @@ public class HuffmanCode implements Serializable {
     }
 
     private void buildHuffmanMap(HuffmanNode root, String s) {
+        if (root == null) return;
+
         if (root.getZero() == null && root.getOne() == null) {
             this.huffmanMap.put(root.getC(), s);
             return;
         }
 
-        if (root != null) {
-            buildHuffmanMap(root.getZero(), s + "0");
-            buildHuffmanMap(root.getOne(), s + "1");
-        }
+        buildHuffmanMap(root.getZero(), s + "0");
+        buildHuffmanMap(root.getOne(), s + "1");
     }
 
+
+    /// JUSTE VISUEL
     public void printCode(HuffmanNode root, String s) {
 
         // base case; if the left and right are null
@@ -134,6 +95,4 @@ public class HuffmanCode implements Serializable {
             printCode(root.getOne(), s + "1");
         }
     }
-
-    // Private methods
 }
