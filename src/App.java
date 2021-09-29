@@ -1,7 +1,5 @@
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.imageio.IIOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
@@ -17,11 +15,13 @@ public class App {
         //// TEMPORARY
 
         FileInputStream fis = new FileInputStream(toCompress);
-        List<Character> orderedChars = sortHashMapByValuesToList(loadFileAsCharHashMap(fis));
-        System.out.println(orderedChars);
+        Map<Character, Integer> orderedFrequencyTable = sortHashMapByValues(loadFileAsCharHashMap(fis));
         HuffmanCode huffmanCode = new HuffmanCode();
-        huffmanCode.encodeHuffmanCode(orderedChars.iterator(), "", huffmanCode.getRootNode());
-//        printMap(huffmanCode.getHuffmanReferenceTable());
+
+        huffmanCode.buildHuffmanTree(orderedFrequencyTable);
+
+
+
         FileInputStream fis2 = new FileInputStream(toCompress);
         String huffmanString = compress(fis2, huffmanCode.getHuffmanReferenceTable());
         System.out.println(huffmanString);
@@ -81,21 +81,13 @@ public class App {
         return charMap;
     }
 
-    public static void printMap(Map<Character, String> map) {
-        for (Entry<Character, String> entry : map.entrySet()) {
-            System.out.println(entry.getKey() +"\t"+entry.getValue());
-        }
-        System.out.println("\n");
-    }
-
-    public static List<Character> sortHashMapByValuesToList(Map<Character, Integer> passedMap) {
+    public static LinkedHashMap<Character, Integer> sortHashMapByValues(Map<Character, Integer> passedMap) {
         List<Character> mapKeys = new ArrayList<>(passedMap.keySet());
         List<Integer> mapValues = new ArrayList<>(passedMap.values());
-        mapValues.sort(Collections.reverseOrder());
-        mapKeys.sort(Collections.reverseOrder());
+        Collections.sort(mapValues);
+        Collections.sort(mapKeys);
 
         LinkedHashMap<Character, Integer> sortedMap = new LinkedHashMap<>();
-        List<Character> sortedList = new LinkedList<>();
 
         for (Integer val : mapValues) {
             Iterator<Character> keyIt = mapKeys.iterator();
@@ -106,14 +98,22 @@ public class App {
 
                 if (comp1.equals(val)) {
                     keyIt.remove();
-                    sortedList.add(key);
+                    sortedMap.put(key, val);
                     break;
                 }
             }
         }
-        return sortedList;
+        return sortedMap;
     }
 
-    private static void encodeData() {}
-    private static void decodeData() {}
+
+
+
+    public static void printMap(Map<Character, String> map) {
+        for (Entry<Character, String> entry : map.entrySet()) {
+            System.out.println(entry.getKey() +"\t"+entry.getValue());
+        }
+        System.out.println("\n");
+    }
+
 }
