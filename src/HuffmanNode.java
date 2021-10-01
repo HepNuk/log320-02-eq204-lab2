@@ -1,4 +1,6 @@
-public class HuffmanNode {
+import java.io.Serializable;
+
+public class HuffmanNode implements Serializable {
     private char c;
     private int freq;
 
@@ -36,4 +38,6 @@ public class HuffmanNode {
     public void setFreq(int freq){ this.freq = freq; }
     public void setZero(HuffmanNode zero) { this.zero = zero; }
     public void setOne(HuffmanNode one) { this.one = one; }
+
+    public Boolean isLeaf() { return (this.zero == null) && (this.one == null); }
 }

@@ -2,13 +2,22 @@ import java.io.Serializable;
 import java.util.*;
 
 public class HuffmanCode implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Map<Character, String> huffmanMap;
     private HuffmanNode rootNode;
+    private int encodedLength;
 
-    public HuffmanCode () {
+    public HuffmanCode() {
         this.rootNode = new HuffmanNode();
         this.huffmanMap = new HashMap<>();
     }
+
+    public HuffmanCode(HuffmanNode rootNode) {
+        this.rootNode = rootNode;
+    }
+
+    public void setEncodedLength(int encodedLength) { this.encodedLength = encodedLength; }
 
     public void buildHuffmanTree(Map<Character, Integer> characterFrequencyTable) {
         PriorityQueue<HuffmanNode> queue = new PriorityQueue<>(characterFrequencyTable.size(), new Comparator<HuffmanNode>() {
@@ -45,6 +54,8 @@ public class HuffmanCode implements Serializable {
 
         this.huffmanMap.clear();
         buildHuffmanMap(rootNode, "");
+        printCode(rootNode, "");
+        this.rootNode = rootNode;
     }
 
     public void decodeHuffmanCode(String data) {
@@ -70,6 +81,36 @@ public class HuffmanCode implements Serializable {
         buildHuffmanMap(root.getOne(), s + "1");
     }
 
+    public String decode(byte[] byteArray) {
+        String huffmanStringToDecode = byteArrayToString(byteArray);
+        String decompressedString = "";
+
+        int i = 0;
+        HuffmanNode currentNode = this.rootNode;
+        while (i < this.encodedLength) {
+            char c = huffmanStringToDecode.charAt(i);
+            if (currentNode.isLeaf()) {
+                decompressedString += currentNode.getC();
+                System.out.print(currentNode.getC());
+                currentNode = this.rootNode;
+            } else {
+                if (c == '0') currentNode = currentNode.getZero();
+                else if (c == '1') currentNode = currentNode.getOne();
+                i++;
+            }
+        }
+        System.out.println(decompressedString);
+        return decompressedString;
+    }
+
+    public String byteArrayToString(byte[] byteArray) {
+        StringBuilder huffmanString = new StringBuilder();
+        for (byte b : byteArray) {
+            huffmanString.append(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
+        }
+
+        return huffmanString.toString().substring(0, this.encodedLength);
+    }
 
     /// JUSTE VISUEL
     public void printCode(HuffmanNode root, String s) {

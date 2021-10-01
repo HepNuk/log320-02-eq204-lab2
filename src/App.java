@@ -9,34 +9,38 @@ public class App {
         //// TEMPORARY
         String toCompress = "to_compress.txt";
         String toDecompress = "to_decompress.txt";
-        String outputCompressed = "compressed.txt";
+        String outputCompressed = "to_decompress.txt";
         String outputDecompressed = "decompressed.txt";
-        char mode = 'c'; // char mode = args[0]
+        char mode = 'd'; // char mode = args[0]
         //// TEMPORARY
-
+        HuffmanCode huffmanCode;
 
         switch (mode) {
             case 'c':
-                System.out.println("Encoding... TODO:");
+                System.out.println("Encoding...");
 
                 FileInputStream fis = new FileInputStream(toCompress);
                 Map<Character, Integer> orderedFrequencyTable = sortHashMapByValues(loadFileAsCharHashMap(fis));
-                HuffmanCode huffmanCode = new HuffmanCode();
+                huffmanCode = new HuffmanCode();
 
                 huffmanCode.buildHuffmanTree(orderedFrequencyTable);
 
                 FileInputStream fis2 = new FileInputStream(toCompress);
-                String huffmanString = compress(fis2, huffmanCode.getHuffmanReferenceTable());
-
-                // TODO: Don't print, instead output to file.
+                String huffmanString = compress(fis2, huffmanCode.getHuffmanReferenceTable()).toString();
+                huffmanCode.setEncodedLength(huffmanString.length());
                 System.out.println(huffmanString);
-                System.out.println(huffmanString.length());
-
+                FileWriter.createFile(huffmanString, outputCompressed, huffmanCode);
                 break;
             case 'd':
-                System.out.println("Decoding... TODO:");
+                System.out.println("Decoding...");
 
-                //TODO: Decode encoded file.
+                FileInputStream fisDecompress = new FileInputStream(toDecompress);
+                ArrayList<Object> files = loadFileToDecompress(fisDecompress);
+
+                HuffmanCode huffmanCode2 = (HuffmanCode) files.get(0);
+                byte[] huffmanByteArray = (byte[]) files.get(1);
+                String decodedHuffmanString = huffmanCode2.decode(huffmanByteArray);
+
                 break;
             default:
                 System.out.println("Invalid Mode..");
@@ -45,7 +49,7 @@ public class App {
         }
     }
 
-    private static String compress(FileInputStream fis, Map<Character, String> huffmanMap) {
+    private static StringBuilder compress(FileInputStream fis, Map<Character, String> huffmanMap) {
         StringBuilder huffmanEncodedString = new StringBuilder();
         try (InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
             int singleCharInt;
@@ -59,7 +63,7 @@ public class App {
             e.printStackTrace();
         }
 
-        return huffmanEncodedString.toString();
+        return huffmanEncodedString;
     }
 
     private static Map<Character, Integer> loadFileAsCharHashMap(FileInputStream fis) {
@@ -110,7 +114,16 @@ public class App {
         return sortedMap;
     }
 
-
+    public static ArrayList<Object> loadFileToDecompress(FileInputStream fis) {
+        ArrayList<Object> objectList = new ArrayList<>();
+        try {
+            ObjectInputStream objIS = new ObjectInputStream(fis);
+            return ((ArrayList<Object>) objIS.readObject());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<Object>();
+        }
+    }
 
 
     public static void printMap(Map<Character, String> map) {
