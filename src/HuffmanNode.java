@@ -24,10 +24,6 @@ public class HuffmanNode implements Serializable {
         this.zero = zero;
         this.one = one;
     }
-    public HuffmanNode() {
-        this.zero = null;
-        this.one = null;
-    }
 
     public char getC() { return this.c; }
     public int getFreq() { return this.freq; }

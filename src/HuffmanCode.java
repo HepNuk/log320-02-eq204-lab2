@@ -1,35 +1,26 @@
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class HuffmanCode implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    private Map<Character, String> huffmanMap;
     private HuffmanNode rootNode;
     private int encodedLength;
 
-    public HuffmanCode() {
-        this.rootNode = new HuffmanNode();
-        this.huffmanMap = new HashMap<>();
-    }
+    public HuffmanCode() { this.rootNode = null; }
 
-    public HuffmanCode(HuffmanNode rootNode) {
-        this.rootNode = rootNode;
-    }
+    public HuffmanNode getRootNode() { return this.rootNode; }
 
     public void setEncodedLength(int encodedLength) { this.encodedLength = encodedLength; }
 
     public void buildHuffmanTree(Map<Character, Integer> characterFrequencyTable) {
-        PriorityQueue<HuffmanNode> queue = new PriorityQueue<>(characterFrequencyTable.size(), new Comparator<HuffmanNode>() {
-            @Override
-            public int compare(HuffmanNode o1, HuffmanNode o2) {
-                return o1.getFreq() - o2.getFreq();
-            }
-        });
+        PriorityQueue<HuffmanNode> queue = new PriorityQueue<>(characterFrequencyTable.size(), new HuffmanComparator());
 
         for (Map.Entry<Character, Integer> entry : characterFrequencyTable.entrySet()) {
             HuffmanNode newNode = new HuffmanNode(entry.getKey(), entry.getValue());
-
             queue.add(newNode);
         }
 
@@ -41,99 +32,105 @@ public class HuffmanCode implements Serializable {
             HuffmanNode y = queue.peek();
             queue.poll();
 
-            HuffmanNode f = new HuffmanNode();
-
-            f.setFreq(x.getFreq() + y.getFreq());
-            f.setZero(x);
-            f.setOne(y);
-
+            HuffmanNode f = new HuffmanNode((x.getFreq() + y.getFreq()), x, y);
             rootNode = f;
 
             queue.add(f);
         }
 
-        this.huffmanMap.clear();
-        buildHuffmanMap(rootNode, "");
-        printCode(rootNode, "");
         this.rootNode = rootNode;
     }
 
-    public void decodeHuffmanCode(String data) {
-        // decode and return decoded data
-    }
+    public static String compress(FileInputStream fis, Map<Character, String> huffmanMap) {
+        StringBuilder huffmanEncodedString = new StringBuilder();
+        try (InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
+            int singleCharInt;
+            char singleChar;
 
-    public HuffmanNode getRootNode() { return this.rootNode; }
-    public Map<Character, String> getHuffmanReferenceTable() { return this.huffmanMap; }
-
-    private void addReference(char huffmanChar, String huffmanCode) {
-        this.huffmanMap.put(huffmanChar, huffmanCode);
-    }
-
-    private void buildHuffmanMap(HuffmanNode root, String s) {
-        if (root == null) return;
-
-        if (root.getZero() == null && root.getOne() == null) {
-            this.huffmanMap.put(root.getC(), s);
-            return;
+            while ((singleCharInt = isr.read()) != -1) {
+                singleChar = (char) singleCharInt;
+                huffmanEncodedString.append(huffmanMap.get(singleChar));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        buildHuffmanMap(root.getZero(), s + "0");
-        buildHuffmanMap(root.getOne(), s + "1");
+        return huffmanEncodedString.toString();
     }
 
     public String decode(byte[] byteArray) {
-        String huffmanStringToDecode = byteArrayToString(byteArray);
-        String decompressedString = "";
+        char[] huffmanStringToDecode = byteArrayToString(byteArray).toCharArray();
+        StringBuilder decompressedString = new StringBuilder();
 
-        int i = 0;
         HuffmanNode currentNode = this.rootNode;
-        while (i < this.encodedLength) {
-            char c = huffmanStringToDecode.charAt(i);
+        for (char c : huffmanStringToDecode) {
+            if (c == '0') currentNode = currentNode.getZero();
+            else if (c == '1') currentNode = currentNode.getOne();
+
             if (currentNode.isLeaf()) {
-                decompressedString += currentNode.getC();
-                System.out.print(currentNode.getC());
+                decompressedString.append(currentNode.getC());
                 currentNode = this.rootNode;
-            } else {
-                if (c == '0') currentNode = currentNode.getZero();
-                else if (c == '1') currentNode = currentNode.getOne();
-                i++;
             }
         }
-        System.out.println(decompressedString);
-        return decompressedString;
+        return decompressedString.toString();
     }
 
     public String byteArrayToString(byte[] byteArray) {
         StringBuilder huffmanString = new StringBuilder();
+
         for (byte b : byteArray) {
             huffmanString.append(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
-        }
 
-        return huffmanString.toString().substring(0, this.encodedLength);
+        }
+        return huffmanString.substring(0, this.encodedLength);
     }
 
-    /// JUSTE VISUEL
-    public void printCode(HuffmanNode root, String s) {
+    public static void buildHuffmanMapFromTree(Map<Character, String> map, HuffmanNode root, String s) {
+        if (root == null) return;
 
-        // base case; if the left and right are null
-        // then its a leaf node and we print
-        // the code s generated by traversing the tree.
         if (root.getZero() == null && root.getOne() == null) {
-
-            // c is the character in the node
-            System.out.println(root.getC() + ":" + s);
-
+            map.put(root.getC(), s);
             return;
         }
 
-        // if we go to left then add "0" to the code.
-        // if we go to the right add"1" to the code.
-
-        // recursive calls for left and
-        // right sub-tree of the generated tree.
-        if (root != null) {
-            printCode(root.getZero(), s + "0");
-            printCode(root.getOne(), s + "1");
-        }
+        buildHuffmanMapFromTree(map, root.getZero(), s + "0");
+        buildHuffmanMapFromTree(map, root.getOne(), s + "1");
     }
+
+    public static byte[] huffmanTextToByteSequence(String huffmanText) throws Exception {
+        int j = -1;
+
+        int byteArraySize = huffmanText.length()/8;
+
+        if (huffmanText.length()%8 != 0) byteArraySize++;
+
+        byte[] byteArray = new byte[byteArraySize];
+
+        for (int i=0; i < byteArraySize*8; i++) {
+            if (i%8 == 0) {
+                j++;
+                byteArray[j] = 0x00;
+            }
+
+            byte tempByte;
+
+            if (i > huffmanText.length()-1 || huffmanText.charAt(i) == '0') tempByte = 0x00;
+            else if (huffmanText.charAt(i) == '1') tempByte = 0x01;
+            else throw new Exception("Error: Char at " + i + " cannot be " + huffmanText.charAt(i));
+
+            byteArray[j] = (byte) (tempByte | (byteArray[j] << 1));
+        }
+        return byteArray;
+    }
+//    /// For Testing
+//    public void printCode(HuffmanNode root, String s) {
+//        if (root.getZero() == null && root.getOne() == null) {
+//            System.out.println(root.getC() + ":" + s);
+//            return;
+//        }
+//        if (root != null) {
+//            printCode(root.getZero(), s + "0");
+//            printCode(root.getOne(), s + "1");
+//        }
+//    }
 }
