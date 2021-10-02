@@ -9,7 +9,6 @@ public class App {
         if (args.length < 3) {
             System.out.println("Error: Missing Input");
             System.out.println("Please use jar_app.jar [c|d] [input filepath] [output filepath]");
-            System.out.flush();
             System.exit(-1);
         }
 
@@ -30,7 +29,6 @@ public class App {
         switch (mode) {
             case 'c':
                 System.out.println("Encoding...");
-                System.out.flush();
                 // Open file and read its content, then build a frequency hashmap table and build a huffman tree with it
                 FileInputStream fis = new FileInputStream(inputFilename);
                 HuffmanCode huffmanCode = new HuffmanCode();
