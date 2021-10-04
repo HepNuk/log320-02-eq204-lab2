@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="log320-02-eq204-lab2:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/log320_02_eq204_lab2_jar</output-path>
+    <root id="archive" name="log320-02-eq204-lab2.jar">
+      <element id="module-output" name="log320-02-eq204-lab2" />
+    </root>
+  </artifact>
+</component>
