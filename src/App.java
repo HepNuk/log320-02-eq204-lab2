@@ -12,7 +12,7 @@ public class App {
             System.out.println("Please use jar_app.jar [c|d] [input filepath] [output filepath]");
             System.exit(-1);
         }
-        if (!(args[2].equals("huff") || args[2].equals("-huff"))) System.exit(0);
+        if (!(args[0].equals("huff") || args[0].equals("-huff"))) System.exit(0);
 
         // Set variables based on args
         char mode = args[1].toLowerCase().charAt(0);
