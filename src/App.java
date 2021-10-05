@@ -6,25 +6,19 @@ import java.util.Map;
 
 public class App {
     public static void main(String[] args) throws IOException {
-        if (args.length < 3) {
+        // Program arguments required 4
+        if (args.length < 4) {
             System.out.println("Error: Missing Input");
             System.out.println("Please use jar_app.jar [c|d] [input filepath] [output filepath]");
             System.exit(-1);
         }
+        if (!(args[2].equals("huff") || args[2].equals("-huff"))) System.exit(0);
 
-        char mode = args[0].toLowerCase().charAt(0);
-        String inputFilename = args[1];
-        String outputFilename = args[2];
-
-
-        //// TEMPORARY FOR TESTING
-//        String inputFilename = "input.txt";
-//        String outputFilename = "output2.txt";
-
-//        String inputFilename = "output2.txt";
-//        String outputFilename = "decomped.txt";
-//        char mode = 'd';
-        //// TEMPORARY END
+        // Set variables based on args
+        char mode = args[1].toLowerCase().charAt(0);
+        if (mode == '-') mode = args[1].toLowerCase().charAt(1);
+        String inputFilename = args[2];
+        String outputFilename = args[3];
 
         switch (mode) {
             case 'c':
